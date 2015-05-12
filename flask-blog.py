@@ -11,6 +11,13 @@ def hello_world():
 def user(name):
     return render_template('user.html',name=name)
 
+@app.route('/jin2/loop')
+def index():
+    months = ['January','February','March','April','May','June','July',
+              'August','September','October','November','December']
+
+    return render_template('weather-average.html',city='Portland, OR',
+                           months=months)
 
 if __name__ == '__main__':
     app.run(debug=True)
