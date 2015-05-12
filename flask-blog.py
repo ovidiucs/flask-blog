@@ -39,7 +39,9 @@ def index():
 
     return render_template('weather-average.html', city='Portland, OR',
                            months=months, weather=weather, highlight=highlight)
-
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('404.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
