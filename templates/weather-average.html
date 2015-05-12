@@ -13,6 +13,8 @@
             <td>{{ month }}</td>
             <td>
                 {% set hl = weather[month]['min'] <= highlight['min'] %}
+            {# set a variable hl, to a condition if, number to show is less
+            row equal to highlight minimum  #}
                 {% if hl %}<b>{% endif %}
                 {{ weather[month]['min'] }}
                 {% if hl %}</b>{% endif %}
