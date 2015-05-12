@@ -11,9 +11,24 @@
     {% for month in months %}
         <tr>
             <td>{{ month }}</td>
-            <td>{{ weather[month]['min'] }}</td>
-            <td>{{ weather[month]['max'] }}</td>
-            <td>{{ weather[month]['rain'] }}</td>
+            <td>
+                {% set hl = weather[month]['min'] <= highlight['min'] %}
+                {% if hl %}<b>{% endif %}
+                {{ weather[month]['min'] }}
+                {% if hl %}</b>{% endif %}
+            </td>
+            <td>
+                {% set hl = weather[month]['max'] >= highlight['max'] %}
+                {% if hl %}<b>{% endif %}
+                {{ weather[month]['max'] }}
+                {% if hl %}</b>{% endif %}
+            </td>
+            <td>
+                {% set hl = weather[month]['rain'] >= highlight['rain'] %}
+                {% if hl %}<b>{% endif %}
+                {{ weather[month]['rain'] }}
+                {% if hl %}</b>{% endif %}
+            </td>
         </tr>
     {% endfor %}
 </table>

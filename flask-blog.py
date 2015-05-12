@@ -7,14 +7,16 @@ app = Flask(__name__)
 def hello_world():
     return render_template('index.html')
 
+
 @app.route('/user/<name>')
 def user(name):
-    return render_template('user.html',name=name)
+    return render_template('user.html', name=name)
+
 
 @app.route('/jin2/loop')
 def index():
-    months = ['January','February','March','April','May','June','July',
-              'August','September','October','November','December']
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+              'August', 'September', 'October', 'November', 'December']
     weather = {
         'January': {'min': 38, 'max': 47, 'rain': 6.14},
         'February': {'min': 38, 'max': 51, 'rain': 4.79},
@@ -30,8 +32,11 @@ def index():
         'December': {'min': 36, 'max': 45, 'rain': 6.94}
     }
 
-    return render_template('weather-average.html',city='Portland, OR',
-                           months=months,weather=weather)
+    highlight = {'min': 40, 'max': 80, 'rain': 5}
+
+    return render_template('weather-average.html', city='Portland, OR',
+                           months=months, weather=weather, highlight=highlight)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
