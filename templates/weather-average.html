@@ -1,3 +1,4 @@
+{% import 'macros.html' as macros %}
 <h1>Weather Averages</h1>
 <h2>{{ city }}</h2>
 <hr>
@@ -9,28 +10,12 @@
         <th>Rainfall</th>
     </tr>
     {% for month in months %}
-        <tr>
-            <td>{{ month }}</td>
-            <td>
-                {% set hl = weather[month]['min'] <= highlight['min'] %}
-            {# set a variable hl, to a condition if, number to show is less
-            row equal to highlight minimum  #}
-                {% if hl %}<b>{% endif %}
-                {{ weather[month]['min'] }}
-                {% if hl %}</b>{% endif %}
-            </td>
-            <td>
-                {% set hl = weather[month]['max'] >= highlight['max'] %}
-                {% if hl %}<b>{% endif %}
-                {{ weather[month]['max'] }}
-                {% if hl %}</b>{% endif %}
-            </td>
-            <td>
-                {% set hl = weather[month]['rain'] >= highlight['rain'] %}
-                {% if hl %}<b>{% endif %}
-                {{ weather[month]['rain'] }}
-                {% if hl %}</b>{% endif %}
-            </td>
-        </tr>
+        {{ macros.weather_row(month,
+                weather[month]['min'],
+                weather[month]['max'],
+                weather[month]['rain'],
+                highlight['min'],
+                highlight['max'],
+                highlight['rain']) }}
     {% endfor %}
 </table>
