@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template,request
 from flask.ext.bootstrap import Bootstrap
 
 
@@ -39,6 +39,15 @@ def index():
 
     return render_template('weather-average.html', city='Portland, OR',
                            months=months, weather=weather, highlight=highlight)
+
+@app.route('/jin2/form', methods=['GET','POST'])
+def findex():
+    name = None
+    if request.method == 'POST' and 'name' in request.form:
+        name = request.form['name']
+    return render_template('form.html', name=name)
+
+
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html')
