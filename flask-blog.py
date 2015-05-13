@@ -1,10 +1,20 @@
 from flask import Flask, render_template,request
 from flask.ext.bootstrap import Bootstrap
+from flask.ext.wtf import Form
+from wtforms import StringField, SubmitField
+from wtforms.validators import Required,Length
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'top secret!'
+
 # initialize extension
 bootstrap = Bootstrap(app)
+
+class NameForm(Form):
+    name = StringField('What is your name?', validators=[Required(),
+                                                         Length(1,16)])
+    submit = SubmitField('Submit')
 
 @app.route('/')
 def hello_world():
@@ -47,6 +57,14 @@ def findex():
         name = request.form['name']
     return render_template('form.html', name=name)
 
+@app.route('/jin2/form2', methods=['GET', 'POST'])
+def index3():
+    name = None
+    form = NameForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        form.name.data = ''
+    return render_template('form2.html', form=form,name=name)
 
 @app.errorhandler(404)
 def not_found(e):
