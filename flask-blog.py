@@ -1,8 +1,10 @@
-from flask import Flask, render_template,request
+import os
+import imghdr
+from flask import Flask, render_template, request
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form
-from wtforms import StringField, SubmitField
-from wtforms.validators import Required,Length
+from wtforms import StringField, SubmitField, FileField, ValidationError
+from wtforms.validators import Required, Length
 
 
 app = Flask(__name__)
@@ -11,10 +13,23 @@ app.config['SECRET_KEY'] = 'top secret!'
 # initialize extension
 bootstrap = Bootstrap(app)
 
+
 class NameForm(Form):
     name = StringField('What is your name?', validators=[Required(),
-                                                         Length(1,16)])
+                                                         Length(1, 16)])
     submit = SubmitField('Submit')
+
+
+class UploadForm(Form):
+    image_file = FileField('Image File')
+    submit = SubmitField('Submit')
+
+    def validate_image_file(self, field):
+        if field.data.filename[-4:].lower() != '.jpg':
+            raise ValueError('Invalid File Extension')
+        if imghdr.what(field.data) != 'jpeg':
+            raise ValueError('Invalid image format')
+
 
 @app.route('/')
 def hello_world():
@@ -26,7 +41,7 @@ def user(name):
     return render_template('user.html', name=name)
 
 
-@app.route('/jin2/loop')
+@app.route('/loop')
 def index():
     months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
               'August', 'September', 'October', 'November', 'December']
@@ -50,25 +65,39 @@ def index():
     return render_template('weather-average.html', city='Portland, OR',
                            months=months, weather=weather, highlight=highlight)
 
-@app.route('/jin2/form', methods=['GET','POST'])
+
+@app.route('/form', methods=['GET', 'POST'])
 def findex():
     name = None
     if request.method == 'POST' and 'name' in request.form:
         name = request.form['name']
     return render_template('form.html', name=name)
 
-@app.route('/jin2/form2', methods=['GET', 'POST'])
+
+@app.route('/form2', methods=['GET', 'POST'])
 def index3():
     name = None
     form = NameForm()
     if form.validate_on_submit():
         name = form.name.data
         form.name.data = ''
-    return render_template('form2.html', form=form,name=name)
+    return render_template('form2.html', form=form, name=name)
+
+
+@app.route('/upload', methods=['GET', 'POST'])
+def index4():
+    image = None
+    form = UploadForm()
+    if form.validate_on_submit():
+        image = 'uploads/' + form.image_file.data.filename
+        form.image_file.data.save(os.path.join(app.static_folder, image))
+    return render_template('upload.html', form=form, image=image)
+
 
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
