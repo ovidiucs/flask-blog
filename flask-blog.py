@@ -19,17 +19,15 @@ class NameForm(Form):
                                                          Length(1, 16)])
     submit = SubmitField('Submit')
 
-
 class UploadForm(Form):
-    image_file = FileField('Image File')
+    image_file = FileField('Image file')
     submit = SubmitField('Submit')
 
     def validate_image_file(self, field):
-        if field.data.filename[-4:].lower() != '.jpg':
-            raise ValueError('Invalid File Extension')
+        if field.data.filename.rsplit('.', 1)[1] != 'jpg':
+            raise ValidationError('Invalid file extension')
         if imghdr.what(field.data) != 'jpeg':
-            raise ValueError('Invalid image format')
-
+            raise ValidationError('Invalid image format')
 
 @app.route('/')
 def hello_world():
