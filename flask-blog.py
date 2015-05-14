@@ -42,9 +42,7 @@ class UploadForm(Form):
 
 
 class User(db.Model):
-    # custom table name
     __tablename__ = 'users'
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(16), index=True, unique=True)
 
@@ -174,10 +172,28 @@ def index6():
     return render_template('other.html', count=session['count'], when=g.when)
 
 
+@app.route('/sql', methods=['GET', 'POST'])
+def sqla():
+    name = None
+    new = False
+
+    form = NameForm()
+
+    if form.validate_on_submit():
+        name = form.name.data
+        form.name.data = ''
+        if User.query.filter_by(name=name).first() is None:
+            db.session.add(User(name=name))
+            db.session.commit()
+            new = True
+    return render_template('sqla.html', form=form, name=name, new=new)
+
+
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html')
 
 
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True)
