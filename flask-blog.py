@@ -1,6 +1,6 @@
 import os
 import imghdr
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField, FileField, ValidationError
@@ -91,6 +91,14 @@ def index4():
         form.image_file.data.save(os.path.join(app.static_folder, image))
     return render_template('upload.html', form=form, image=image)
 
+
+@app.route('/session')
+def index5():
+    if 'count' not in session:
+        session['count'] = 1
+    else:
+        session['count'] += 1
+    return render_template('session.html', count=session['count'])
 
 @app.errorhandler(404)
 def not_found(e):
