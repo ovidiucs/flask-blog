@@ -7,11 +7,14 @@ from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField, FileField, ValidationError
 from wtforms.validators import Required, Length
+from flask.ext.sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'top secret!'
-
+# where the db is
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.sqlite3'
+db = SQLAlchemy(app)
 # initialize extension
 bootstrap = Bootstrap(app)
 
@@ -20,6 +23,7 @@ class NameForm(Form):
     name = StringField('What is your name?', validators=[Required(),
                                                          Length(1, 16)])
     submit = SubmitField('Submit')
+
 
 class UploadForm(Form):
     image_file = FileField('Image file')
@@ -30,6 +34,23 @@ class UploadForm(Form):
             raise ValidationError('Invalid file extension')
         if imghdr.what(field.data) != 'jpeg':
             raise ValidationError('Invalid image format')
+
+
+# Define a class that represents our users in the database
+# This class inherits from  a base model classes
+# Models > Classes > Associated with entities within a database.
+
+
+class User(db.Model):
+    # custom table name
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(16), index=True, unique=True)
+
+    def __repr__(self):
+        return '<User {0}>'.format(self.name)
+
 
 @app.route('/')
 def hello_world():
@@ -74,6 +95,7 @@ def response():
     resp = make_response(render_template('text.txt'))
     resp.headers['Content-Type'] = 'text/plain'
     return resp
+
 
 @app.route('/user/<name>')
 def user(name):
@@ -150,6 +172,7 @@ def index5():
 @app.route('/other')
 def index6():
     return render_template('other.html', count=session['count'], when=g.when)
+
 
 @app.errorhandler(404)
 def not_found(e):
