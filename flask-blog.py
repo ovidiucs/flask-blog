@@ -1,13 +1,17 @@
 import os
 import imghdr
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from flask import Flask, render_template, request, session, g, \
     make_response, jsonify, url_for, redirect
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.wtf import Form
-from wtforms import StringField, SubmitField, FileField, ValidationError
+from wtforms import PasswordField, StringField, SubmitField, FileField, \
+    ValidationError, BooleanField
 from wtforms.validators import Required, Length
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.login import LoginManager, UserMixin, login_user, logout_user, \
+    login_required
 
 
 app = Flask(__name__)
@@ -21,6 +25,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.sqlite3'
 db = SQLAlchemy(app)
 # initialize extension
 bootstrap = Bootstrap(app)
+# login manager
+lm = LoginManager(app)
+lm.login_view = 'login'
 
 
 class NameForm(Form):
@@ -47,7 +54,7 @@ class UploadForm(Form):
 # length for our String fields in the database. Using our models is also extremely
 # simple, thanks to the SQLAlchemy query syntax
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(16), index=True, unique=True)
@@ -72,6 +79,18 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {0}>'.format(self.name)
+
+
+@lm.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+
+class LoginForm(Form):
+    username = StringField('Username', validators=[Required(), Length(1, 16)])
+    password = PasswordField('Password', validators=[Required()])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Submit')
 
 
 @app.route('/')
@@ -212,6 +231,9 @@ def sqla():
             new = True
     return render_template('sqla.html', form=form, name=name, new=new)
 
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
 
 @app.errorhandler(404)
 def not_found(e):
