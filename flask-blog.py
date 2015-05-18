@@ -80,9 +80,8 @@ class User(UserMixin, db.Model):
         db.session.commit()
         return user
 
-
     def __repr__(self):
-        return '<User {0}>'.format(self.name)
+        return '<User {0}>'.format(self.username)
 
 
 @lm.user_loader
@@ -240,6 +239,7 @@ def sqla():
 def load_user(id):
     return User.query.get(int(id))
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -275,8 +275,13 @@ def login():
         if user is None or not user.verify_password(form.password.data):
             return redirect(url_for('login'), **request.args)
         login_user(user, form.remember_me.data)
-        return redirect(request.args.get('next') or url_for('index'))
+        return redirect(request.args.get('next') or url_for('login'))
     return render_template('login.html', form=form)
+
+
+"""
+This route needs to be protected
+"""
 
 
 @app.route('/logout')
@@ -285,6 +290,13 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
+@app.route('/protected')
+@login_required
+def protected():
+    return render_template('protected.html')
+
+
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html')
@@ -292,4 +304,6 @@ def not_found(e):
 
 if __name__ == '__main__':
     db.create_all()
+    if User.query.filter_by(username='john').first() is None:
+        User.register('john', 'cat')
     app.run(debug=True)
