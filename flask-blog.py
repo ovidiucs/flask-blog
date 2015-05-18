@@ -55,6 +55,7 @@ class UploadForm(Form):
 # simple, thanks to the SQLAlchemy query syntax
 
 class User(UserMixin, db.Model):
+
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(16), index=True, unique=True)
@@ -232,8 +233,27 @@ def sqla():
     return render_template('sqla.html', form=form, name=name, new=new)
 
 
+@lm.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.verify_password(form.password.data):
+            return redirect(url_for('login'), **request.args)
+        login_user(user, form.remember_me.data)
+        return redirect(request.args.get('next') or url_for('index'))
+    return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.errorhandler(404)
 def not_found(e):
