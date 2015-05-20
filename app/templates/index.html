@@ -1,22 +1,10 @@
-<h1>This page containes HTML</h1>
-<p>
-    Cookie:
-    {% if 'cookie' in request.cookies %}
-        <b>{{ request.cookies['cookie'] }}</b>
-    {% else %}
-        not set
-    {% endif %}
-</p>
-<p><a href="{{ url_for('text') }}">Click here</a> to view a page that
-    contains plain text</p>
-<p><a href="{{ url_for('xml') }}">Click here</a> to view a page that
-    contains XML data</p>
-<p><a href="{{ url_for('json') }}">Click here</a> to view a page that
-    contains JSON data </p>
-<p><a href="{{ url_for('redir') }}">Click here</a> to view a page that
-    redirect to the plain text page</p>
-<p><a href="{{ url_for('cookie') }}">Click here</a> to view a page that sets
-    a cookie and then redirect back to this page
-</p>
-<p><a href="{{ url_for('response') }}">Click here</a> to view a page
-    that shows plain text through a response object.</p>
+{% extends "base.html" %}
+
+{% block title %}Login Example{% endblock %}
+
+{% block page_content %}
+	<h1>Home page</h1>
+	<p>This page can be viewed by all users.</p>
+	<p>You are {% if not current_user.is_authenticated() %}not {% endif %}
+		logged in.</p>
+{% endblock %}

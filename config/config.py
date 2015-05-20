@@ -3,5 +3,5 @@ import os
 
 DEBUG = True
 SECRET_KEY = 'top secret'
-SQLALHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(
+SQLALCHEMY_DATABASE_URI = 'sqllite:///' + os.path.join(
     os.path.dirname(__file__), '../data-dev.sqlite3')
